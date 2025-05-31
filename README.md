@@ -1,4 +1,4 @@
-# Gomoku AI Project
+# Gomoku AI Project [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/yourself-q/gomoku-ai)
 
 This project aims to create a self-learning Gomoku AI model with the following components:
 1. A Gomoku game implementation
