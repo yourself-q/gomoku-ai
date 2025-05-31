@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gomoku Game</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #board { display: inline-block; margin-top: 20px; position: relative; }
+        .cell { width: 40px; height: 40px; border: 1px solid #ccc; float: left; }
+        .piece { width: 36px; height: 36px; border-radius: 50%; position: absolute; }
+        .black { background-color: black; }
+        .white { background-color: white; }
+    </style>
+</head>
+<body>
+    <h1>Gomoku Game</h1>
+    <div id="board"></div>
+    <button onclick="resetBoard()">Reset</button>
+
+    <script>
+        const boardSize = 15;
+        const cellSize = 40;
+        let currentPlayer = 1;
+
+        function drawBoard() {
+            const board = document.getElementById('board');
+            board.innerHTML = '';
+
+            for (let row = 0; row < boardSize; row++) {
+                for (let col = 0; col < boardSize; col++) {
+                    const cell = document.createElement('div');
+                    cell.classList.add('cell');
+                    cell.style.left = `${col * cellSize}px`;
+                    cell.style.top = `${row * cellSize}px`;
+
+                    cell.addEventListener('click', () => makeMove(row, col));
+                    board.appendChild(cell);
+                }
+            }
+        }
+
+        function updateBoard(boardData) {
+            const board = document.getElementById('board');
+            board.innerHTML = ''; // Clear existing pieces
+
+            for (let row = 0; row < boardSize; row++) {
+                for (let col = 0; col < boardSize; col++) {
+                    if (boardData[row][col] !== 0) {
+                        const piece = document.createElement('div');
+                        piece.classList.add('piece', boardData[row][col] === 1 ? 'black' : 'white');
+                        piece.style.left = `${col * cellSize}px`;
+                        piece.style.top = `${row * cellSize}px`;
+                        board.appendChild(piece);
+                    }
+                }
+            }
+        }
+
+        async function makeMove(row, col) {
+            const response = await fetch('/move', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ row, col })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                currentPlayer = 3 - currentPlayer; // Switch player
+                if (result.winner !== 0) {
+                    alert(`Player ${result.winner} wins!`);
+                }
+                fetchBoardData();
+            } else {
+                alert('Invalid move');
+            }
+        }
+
+        async function fetchBoardData() {
+            const response = await fetch('/board');
+            const data = await response.json();
+            updateBoard(data.board);
+            currentPlayer = data.currentPlayer;
+        }
+
+        async function resetBoard() {
+            await fetch('/reset', { method: 'POST' });
+            fetchBoardData();
+        }
+
+        // Initialize
+        drawBoard();
+        fetchBoardData();
+    </script>
+</body>
+</html>

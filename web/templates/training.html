@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gomoku AI Training</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #progress-bar { width: 50%; margin: 20px auto; height: 30px; background-color: #f3f3f3; }
+        #progress { height: 100%; width: 0%; background-color: #4caf50; text-align: center; line-height: 30px; color: white; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Gomoku AI Training</h1>
+    <div id="status">Ready to start training</div>
+    <button onclick="startTraining()" id="train-button">Start Training</button>
+
+    <div id="progress-container" style="display: none;">
+        <div id="progress-bar">
+            <div id="progress"></div>
+        </div>
+        <div id="stats">
+            Wins: <span id="wins">0</span><br>
+            Losses: <span id="losses">0</span><br>
+            Draws: <span id="draws">0</span>
+        </div>
+    </div>
+
+    <script>
+        let trainingInterval;
+
+        function startTraining() {
+            fetch('/train', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('train-button').disabled = true;
+                        document.getElementById('progress-container').style.display = 'block';
+                        trainingInterval = setInterval(updateTrainingStatus, 500);
+                    } else {
+                        alert(data.error);
+                    }
+                });
+        }
+
+        function updateTrainingStatus() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('status').innerText = data.status;
+                    if (data.status === 'training' || data.status === 'complete') {
+                        const progressPercent = Math.min(data.progress, 100);
+                        document.getElementById('progress').style.width = `${progressPercent}%`;
+                        document.getElementById('progress').innerText = `${Math.round(progressPercent)}%`;
+
+                        document.getElementById('wins').innerText = data.wins;
+                        document.getElementById('losses').innerText = data.losses;
+                        document.getElementById('draws').innerText = data.draws;
+
+                        if (data.status === 'complete') {
+                            clearInterval(trainingInterval);
+                            document.getElementById('train-button').disabled = false;
+                        }
+                    }
+                });
+        }
+
+        // Check status periodically
+        setInterval(updateTrainingStatus, 5000);
+    </script>
+</body>
+</html>

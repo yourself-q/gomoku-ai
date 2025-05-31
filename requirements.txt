@@ -1,0 +1,17 @@
+# Core libraries
+numpy
+scipy
+
+# Machine learning frameworks
+tensorflow
+keras
+
+# GUI libraries
+tkinter
+Pillow
+
+# Web framework for serving the GUI (optional)
+flask
+
+# Other utilities
+matplotlib
