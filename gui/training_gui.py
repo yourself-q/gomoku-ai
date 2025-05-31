@@ -2,6 +2,12 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import threading
 import numpy as np
+import sys
+import os
+
+# Add the project root directory to the Python path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
 from game.gomoku import Gomoku
 from ai.reinforcement_player import ReinforcementPlayer
 from ai.random_player import RandomPlayer
